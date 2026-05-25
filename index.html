@@ -3,23 +3,28 @@
 <head>
   <title>Planejamento em Mãos</title>
 
+  <!-- ✅ FONTE LATO -->
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
-      font-family: Arial;
+      font-family: 'Lato', sans-serif;
       text-align: center;
+      background: #f4f6f8;
     }
 
     #app.blur {
       filter: blur(8px);
     }
 
-    /* TOPO */
+    /* ✅ TOPO */
     #topo {
       display: flex;
       align-items: center;
-      background: white;
-      padding: 10px;
+      background: #ffffff;
+      padding: 10px 20px;
+      border-bottom: 1px solid #ddd;
     }
 
     #topo img {
@@ -29,9 +34,11 @@
     #topo h2 {
       margin-left: 15px;
       font-weight: 400;
+      color: #2c3e50;
+      font-size: 22px;
     }
 
-    /* BANNER */
+    /* ✅ BANNER */
     #banner {
       height: 250px;
       background-size: cover;
@@ -40,19 +47,26 @@
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 40px;
+      font-size: 42px;
+      font-weight: 300;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     }
 
-    /* LISTA */
+    /* ✅ LISTA */
     #lista button {
       display: block;
       width: 300px;
       margin: 10px auto;
-      padding: 10px;
+      padding: 12px;
       cursor: pointer;
+      background: #1f6e8c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
     }
 
-    /* DETALHE */
+    /* ✅ DETALHE */
     #detalhe {
       display: none;
     }
@@ -63,15 +77,34 @@
 
     .tituloAzul {
       color: #1f6e8c;
+      font-size: 22px;
     }
 
     .tituloVerde {
-      color: green;
+      color: #2ecc71;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    p {
+      margin: 6px;
+      font-size: 16px;
     }
 
     img {
       max-width: 90%;
+      border-radius: 8px;
       margin: 15px 0;
+    }
+
+    button {
+      margin: 20px;
+      padding: 10px 20px;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
     }
 
   </style>
@@ -90,24 +123,24 @@
 <!-- APP -->
 <div id="app" style="display:none;">
 
-  <!-- LISTA -->
+  <!-- 🔥 LISTA -->
   <div id="lista"></div>
 
-  <!-- DETALHE -->
+  <!-- 🔥 DETALHE -->
   <div id="detalhe">
 
-    <!-- TOPO -->
+    <!-- ✅ TOPO COM LOGO -->
     <div id="topo">
-      <img src="https://via.placeholder.com/100">
+      <img id="logo" src="LINK_DA_SUA_LOGO_AQUI">
       <h2>Planejamento em Mãos</h2>
     </div>
 
-    <!-- BANNER -->
+    <!-- ✅ BANNER -->
     <div id="banner">
       <span id="titulo"></span>
     </div>
 
-    <!-- DADOS -->
+    <!-- ✅ DADOS -->
     <div class="bloco">
       <h3 class="tituloAzul">Dados</h3>
       <p id="data"></p>
@@ -115,22 +148,21 @@
       <p id="avanco"></p>
     </div>
 
-    <!-- SITUAÇÃO -->
+    <!-- ✅ SITUAÇÃO -->
     <div class="bloco">
       <h3 class="tituloVerde" id="situacao"></h3>
     </div>
 
-    <!-- PREVISTO x REALIZADO -->
+    <!-- ✅ PREVISTO -->
     <div class="bloco">
       <h3 class="tituloAzul">Previsto x Realizado</h3>
       <p id="inicio"></p>
       <p id="previsto"></p>
       <p id="realizado"></p>
-
       <img id="grafico">
     </div>
 
-    <!-- IMAGENS -->
+    <!-- ✅ IMAGENS -->
     <div class="bloco">
       <img id="img1">
       <img id="img2">
@@ -143,7 +175,7 @@
 
 </div>
 
-<!-- FIREBASE -->
+<!-- ✅ FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -162,7 +194,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// LOGIN
+// ✅ LOGIN
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -172,20 +204,6 @@ async function login() {
 
     const userCredential = await auth.signInWithEmailAndPassword(email, senha);
     const user = userCredential.user;
-
-    const device = navigator.userAgent;
-
-    const ref = db.collection("users_devices").doc(user.uid);
-    const docSnap = await ref.get();
-
-    if (!docSnap.exists) {
-      await ref.set({ device: device });
-    } else {
-      if (docSnap.data().device !== device) {
-        alert("Dispositivo bloqueado");
-        return;
-      }
-    }
 
     document.getElementById("login").style.display = "none";
     document.getElementById("app").style.display = "block";
@@ -198,7 +216,7 @@ async function login() {
 }
 
 
-// LISTA DE FRENTES
+// ✅ LISTAR FRENTES
 async function carregarFrentes() {
 
   const lista = document.getElementById("lista");
@@ -215,12 +233,11 @@ async function carregarFrentes() {
     btn.onclick = () => abrirDetalhe(data);
 
     lista.appendChild(btn);
-
   });
 }
 
 
-// ABRIR DETALHE
+// ✅ ABRIR DETALHE
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
@@ -228,59 +245,31 @@ function abrirDetalhe(data) {
 
   document.getElementById("titulo").innerText = data.Nome;
 
-  // BANNER
   document.getElementById("banner").style.backgroundImage =
     "url('" + data.Imagem + "')";
 
-  document.getElementById("data").innerText =
-    data["Data Prevista"];
+  document.getElementById("data").innerText = data["Data Prevista"];
+  document.getElementById("total").innerText = "Total: " + data.Total;
+  document.getElementById("avanco").innerText = "Avanço: " + data["Avanço"];
 
-  document.getElementById("total").innerText =
-    "Total: " + data.Total;
+  document.getElementById("situacao").innerText = data.Situacao || "";
 
-  document.getElementById("avanco").innerText =
-    "Avanço: " + data["Avanço"];
+  document.getElementById("inicio").innerText = data.Inicio || "";
+  document.getElementById("previsto").innerText = data.Previsto || "";
+  document.getElementById("realizado").innerText = data.Realizado || "";
 
-  document.getElementById("situacao").innerText =
-    data.Situacao || "";
-
-  document.getElementById("inicio").innerText =
-    data.Inicio || "";
-
-  document.getElementById("previsto").innerText =
-    data.Previsto || "";
-
-  document.getElementById("realizado").innerText =
-    data.Realizado || "";
-
-  // IMAGENS
   document.getElementById("grafico").src = data.Grafico || "";
   document.getElementById("img1").src = data.Imagem1 || "";
   document.getElementById("img2").src = data.Imagem2 || "";
   document.getElementById("img3").src = data.Imagem3 || "";
-
 }
 
 
-// VOLTAR
+// ✅ VOLTAR
 function voltar() {
-
   document.getElementById("lista").style.display = "block";
   document.getElementById("detalhe").style.display = "none";
-
 }
-
-
-// BLUR
-document.addEventListener("visibilitychange", () => {
-  const app = document.getElementById("app");
-
-  if (document.hidden) {
-    app.classList.add("blur");
-  } else {
-    app.classList.remove("blur");
-  }
-});
 
 </script>
 
