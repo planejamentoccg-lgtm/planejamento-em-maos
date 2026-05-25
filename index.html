@@ -21,6 +21,7 @@
 
 <div id="watermark"></div>
 
+<!-- ✅ SCRIPTS CORRETOS -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -69,11 +70,11 @@ async function login() {
       }
     }
 
-    // ✅ MOSTRAR SISTEMA
+    // ✅ TROCA DE TELA (AGORA FUNCIONA)
     document.getElementById("login").style.display = "none";
     document.getElementById("sistema").style.display = "block";
 
-    // 👁️ MARCA D'ÁGUA
+    // 👁️ MARCA D’ÁGUA
     const watermark = document.getElementById("watermark");
 
     watermark.innerText = email + " | " + new Date().toLocaleString();
@@ -93,9 +94,11 @@ async function login() {
 
   } catch (e) {
     alert("Erro: " + e.message);
+    console.log(e);
   }
 }
 
+// 🧊 BLUR
 document.addEventListener("visibilitychange", () => {
   document.body.style.filter = document.hidden ? "blur(8px)" : "none";
 });
