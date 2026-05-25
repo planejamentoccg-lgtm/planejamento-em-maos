@@ -12,6 +12,8 @@
 
 <button onclick="login()">Entrar</button>
 
+<div id="watermark"></div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -39,7 +41,6 @@ async function login() {
     const userCredential = await auth.signInWithEmailAndPassword(email, senha);
     const user = userCredential.user;
 
-    // 🔐 fingerprint do dispositivo
     const device = navigator.userAgent + screen.width + screen.height;
 
     const ref = db.collection("users_devices").doc(user.uid);
@@ -47,10 +48,8 @@ async function login() {
 
     if (!docSnap.exists) {
 
-      // ✅ PRIMEIRO LOGIN DO USUÁRIO
       await ref.set({
-        device: device,
-        createdAt: new Date().toISOString()
+        device: device
       });
 
       alert("✅ Dispositivo registrado");
@@ -60,20 +59,44 @@ async function login() {
       const data = docSnap.data();
 
       if (data.device !== device) {
-        alert("🚫 Acesso bloqueado: dispositivo diferente");
+        alert("🚫 Dispositivo bloqueado");
         return;
       }
 
       alert("✅ Login autorizado");
-
     }
+
+    // 👁️ MARCA D’ÁGUA
+    const watermark = document.getElementById("watermark");
+
+    watermark.innerText = email + " | " + new Date().toLocaleString();
+
+    watermark.style.position = "fixed";
+    watermark.style.top = "0";
+    watermark.style.left = "0";
+    watermark.style.width = "100%";
+    watermark.style.height = "100%";
+    watermark.style.opacity = "0.08";
+    watermark.style.fontSize = "28px";
+    watermark.style.display = "flex";
+    watermark.style.alignItems = "center";
+    watermark.style.justifyContent = "center";
+    watermark.style.transform = "rotate(-30deg)";
+    watermark.style.pointerEvents = "none";
 
   } catch (e) {
     alert("Erro: " + e.message);
-    console.log(e);
   }
-
 }
+
+// 🧊 BLUR AO SAIR DA ABA
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    document.body.style.filter = "blur(8px)";
+  } else {
+    document.body.style.filter = "none";
+  }
+});
 
 </script>
 
