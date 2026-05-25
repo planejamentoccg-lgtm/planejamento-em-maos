@@ -7,53 +7,73 @@
     body {
       margin: 0;
       font-family: Arial;
-      transition: filter 0.3s;
+      text-align: center;
     }
 
     #app.blur {
       filter: blur(10px);
     }
 
-    #watermark {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.12;
-      font-size: 14px;
-      color: rgba(0,0,0,0.3);
-      white-space: pre-wrap;
+    #lista button {
+      display: block;
+      width: 300px;
+      margin: 10px auto;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background: #f5f5f5;
+    }
+
+    #detalhe {
       display: none;
+      padding: 20px;
+    }
+
+    img {
+      max-width: 90%;
+      margin-top: 15px;
     }
   </style>
-
 </head>
+
 <body>
 
-<div id="app">
+<!-- LOGIN -->
+<div id="login">
+  <h1>Login</h1>
 
-  <div id="login">
-    <h1>Login</h1>
+  <input type="email" id="email" placeholder="Email"><br><br>
+  <input type="password" id="senha" placeholder="Senha"><br><br>
 
-    <input type="email" id="email" placeholder="Email"><br><br>
-    <input type="password" id="senha" placeholder="Senha"><br><br>
+  <button onclick="login()">Entrar</button>
+</div>
 
-    <button onclick="login()">Entrar</button>
-  </div>
+<!-- APP -->
+<div id="app" style="display:none;">
 
-  <div id="sistema" style="display:none;">
-    <h1>Bem-vindo 🚀</h1>
-    <p>Sistema ativo</p>
+  <h1>Frentes de Serviço</h1>
+
+  <!-- LISTA -->
+  <div id="lista"></div>
+
+  <!-- DETALHE -->
+  <div id="detalhe">
+    <h2 id="nome"></h2>
+
+    <img id="imagem">
+
+    <p id="data"></p>
+    <p id="total"></p>
+    <p id="avanco"></p>
+
+    <br>
+    <button onclick="voltar()">Voltar</button>
   </div>
 
 </div>
 
-<div id="watermark"></div>
-
-<!-- ✅ FIREBASE CORRETO -->
+<!-- FIREBASE ✅ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -71,6 +91,8 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+
+// ✅ LOGIN
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -81,74 +103,88 @@ async function login() {
     const userCredential = await auth.signInWithEmailAndPassword(email, senha);
     const user = userCredential.user;
 
-    const device = navigator.userAgent + screen.width + screen.height;
+    const device = navigator.userAgent;
 
     const ref = db.collection("users_devices").doc(user.uid);
+    const docSnap = await ref.get();
 
-    let autorizado = true;
-
-    try {
-      const docSnap = await ref.get();
-
-      if (!docSnap.exists) {
-        await ref.set({ device: device });
-      } else {
-        const data = docSnap.data();
-
-        if (data.device !== device) {
-          alert("🚫 Dispositivo bloqueado");
-          autorizado = false;
-        }
+    if (!docSnap.exists) {
+      await ref.set({ device: device });
+    } else {
+      if (docSnap.data().device !== device) {
+        alert("🚫 Dispositivo bloqueado");
+        return;
       }
-    } catch {}
-
-    if (!autorizado) return;
-
-    // ✅ TROCAR TELA
-    document.getElementById("login").style.display = "none";
-    document.getElementById("sistema").style.display = "block";
-
-    // ✅ WATERMARK (AGORA FUNCIONA)
-    const watermark = document.getElementById("watermark");
-    watermark.style.display = "block";
-
-    let texto = email + " | " + new Date().toLocaleString();
-    let linhas = "";
-
-    for (let i = 0; i < 80; i++) {
-      linhas += texto + "\n";
     }
 
-    watermark.innerText = linhas;
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+    carregarFrentes();
 
   } catch (e) {
-    alert("Erro: " + e.message);
+    alert(e.message);
   }
 }
 
 
+// ✅ CARREGAR LISTA
+async function carregarFrentes() {
+
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  const snapshot = await db.collection("Frentes").get();
+
+  snapshot.forEach(doc => {
+
+    const data = doc.data();
+
+    const btn = document.createElement("button");
+
+    btn.innerText = data.Nome;
+
+    btn.onclick = () => abrirDetalhe(data);
+
+    lista.appendChild(btn);
+
+  });
+
+}
+
+
+// ✅ ABRIR DETALHE
+function abrirDetalhe(data) {
+
+  document.getElementById("lista").style.display = "none";
+  document.getElementById("detalhe").style.display = "block";
+
+  document.getElementById("nome").innerText = data.Nome;
+  document.getElementById("imagem").src = data.Imagem;
+  document.getElementById("data").innerText = "Data: " + data["Data Prevista"];
+  document.getElementById("total").innerText = "Total: " + data.Total;
+  document.getElementById("avanco").innerText = "Avanço: " + data["Avanço"];
+
+}
+
+
+// ✅ VOLTAR
+function voltar() {
+
+  document.getElementById("lista").style.display = "block";
+  document.getElementById("detalhe").style.display = "none";
+
+}
+
+
 // ✅ BLUR
-function ativarBlur() {
-  document.getElementById("app").classList.add("blur");
-}
-
-function removerBlur() {
-  document.getElementById("app").classList.remove("blur");
-}
-
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) ativarBlur();
-  else removerBlur();
+  if (document.hidden) {
+    document.getElementById("app").classList.add("blur");
+  } else {
+    document.getElementById("app").classList.remove("blur");
+  }
 });
-
-window.addEventListener("blur", ativarBlur);
-window.addEventListener("focus", removerBlur);
-window.addEventListener("pagehide", ativarBlur);
-window.addEventListener("pageshow", removerBlur);
-
-setInterval(() => {
-  if (!document.hasFocus()) ativarBlur();
-}, 800);
 
 </script>
 
