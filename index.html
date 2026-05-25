@@ -21,7 +21,6 @@
 
 <div id="watermark"></div>
 
-<!-- ✅ SCRIPTS CORRETOS -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -52,31 +51,43 @@ async function login() {
     const device = navigator.userAgent + screen.width + screen.height;
 
     const ref = db.collection("users_devices").doc(user.uid);
-    const docSnap = await ref.get();
 
-    if (!docSnap.exists) {
+    let autorizado = true;
 
-      await ref.set({
-        device: device
-      });
+    try {
+      const docSnap = await ref.get();
 
-    } else {
+      if (!docSnap.exists) {
+        await ref.set({ device: device });
+      } else {
+        const data = docSnap.data();
 
-      const data = docSnap.data();
-
-      if (data.device !== device) {
-        alert("🚫 Dispositivo bloqueado");
-        return;
+        if (data.device !== device) {
+          alert("🚫 Dispositivo bloqueado");
+          autorizado = false;
+        }
       }
+
+    } catch (erroBanco) {
+      console.log("Erro no banco:", erroBanco);
+      alert("⚠️ Banco falhou, mas login continuará (modo seguro)");
     }
 
-    // ✅ TROCA DE TELA (AGORA FUNCIONA)
-    document.getElementById("login").style.display = "none";
-    document.getElementById("sistema").style.display = "block";
+    if (!autorizado) return;
 
-    // 👁️ MARCA D’ÁGUA
+    // ✅ FORÇAR TROCA DE TELA
+    const loginDiv = document.getElementById("login");
+    const sistemaDiv = document.getElementById("sistema");
+
+    if (loginDiv && sistemaDiv) {
+      loginDiv.style.display = "none";
+      sistemaDiv.style.display = "block";
+    } else {
+      alert("Erro ao carregar sistema");
+    }
+
+    // ✅ MARCA D'ÁGUA
     const watermark = document.getElementById("watermark");
-
     watermark.innerText = email + " | " + new Date().toLocaleString();
 
     watermark.style.position = "fixed";
@@ -94,11 +105,10 @@ async function login() {
 
   } catch (e) {
     alert("Erro: " + e.message);
-    console.log(e);
   }
 }
 
-// 🧊 BLUR
+// blur
 document.addEventListener("visibilitychange", () => {
   document.body.style.filter = document.hidden ? "blur(8px)" : "none";
 });
