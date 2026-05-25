@@ -12,7 +12,6 @@
 
 <button onclick="login()">Entrar</button>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -40,15 +39,34 @@ async function login() {
     const userCredential = await auth.signInWithEmailAndPassword(email, senha);
     const user = userCredential.user;
 
-    alert("✅ Login funcionando + conectado ao banco!");
+    // 🔐 fingerprint do dispositivo
+    const device = navigator.userAgent + screen.width + screen.height;
 
-    // TESTE FIRESTORE
-    await db.collection("teste").add({
-      email: email,
-      data: new Date().toISOString()
-    });
+    const ref = db.collection("users_devices").doc(user.uid);
+    const docSnap = await ref.get();
 
-    console.log("✅ Gravou no Firestore");
+    if (!docSnap.exists) {
+
+      // ✅ PRIMEIRO LOGIN DO USUÁRIO
+      await ref.set({
+        device: device,
+        createdAt: new Date().toISOString()
+      });
+
+      alert("✅ Dispositivo registrado");
+
+    } else {
+
+      const data = docSnap.data();
+
+      if (data.device !== device) {
+        alert("🚫 Acesso bloqueado: dispositivo diferente");
+        return;
+      }
+
+      alert("✅ Login autorizado");
+
+    }
 
   } catch (e) {
     alert("Erro: " + e.message);
