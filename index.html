@@ -29,8 +29,8 @@
       display: none;
     }
   </style>
-</head>
 
+</head>
 <body>
 
 <div id="app">
@@ -53,7 +53,7 @@
 
 <div id="watermark"></div>
 
-<!-- ✅ SCRIPT CORRETO -->
+<!-- ✅ FIREBASE CORRETO -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -100,16 +100,15 @@ async function login() {
           autorizado = false;
         }
       }
-
     } catch {}
 
     if (!autorizado) return;
 
-    // ✅ TROCA DE TELA
+    // ✅ TROCAR TELA
     document.getElementById("login").style.display = "none";
     document.getElementById("sistema").style.display = "block";
 
-    // ✅ WATERMARK (FORÇADA)
+    // ✅ WATERMARK (AGORA FUNCIONA)
     const watermark = document.getElementById("watermark");
     watermark.style.display = "block";
 
@@ -128,7 +127,7 @@ async function login() {
 }
 
 
-// ✅ BLUR MELHORADO
+// ✅ BLUR
 function ativarBlur() {
   document.getElementById("app").classList.add("blur");
 }
