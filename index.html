@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Teste Login</title>
+  <title>Planejamento em Mãos</title>
 </head>
 <body>
 
-<h1>Login Básico</h1>
+<h1>Login</h1>
 
 <input type="email" id="email" placeholder="Email"><br><br>
 <input type="password" id="senha" placeholder="Senha"><br><br>
 
 <button onclick="login()">Entrar</button>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
 
@@ -26,6 +28,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 async function login() {
 
@@ -33,10 +36,23 @@ async function login() {
   const senha = document.getElementById("senha").value;
 
   try {
-    await auth.signInWithEmailAndPassword(email, senha);
-    alert("✅ Login funcionando!");
+
+    const userCredential = await auth.signInWithEmailAndPassword(email, senha);
+    const user = userCredential.user;
+
+    alert("✅ Login funcionando + conectado ao banco!");
+
+    // TESTE FIRESTORE
+    await db.collection("teste").add({
+      email: email,
+      data: new Date().toISOString()
+    });
+
+    console.log("✅ Gravou no Firestore");
+
   } catch (e) {
     alert("Erro: " + e.message);
+    console.log(e);
   }
 
 }
