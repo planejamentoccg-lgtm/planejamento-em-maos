@@ -3,7 +3,7 @@
 <head>
   <title>Planejamento em Mãos</title>
 
-  <!-- ✅ FONTE LATO -->
+  <!-- ✅ FONTE LATO (IMPORTANTE) -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -28,7 +28,7 @@
     }
 
     #topo img {
-      height: 50px;
+      height: 55px;
     }
 
     #topo h2 {
@@ -106,7 +106,6 @@
       cursor: pointer;
       border-radius: 5px;
     }
-
   </style>
 </head>
 
@@ -123,10 +122,10 @@
 <!-- APP -->
 <div id="app" style="display:none;">
 
-  <!-- 🔥 LISTA -->
+  <!-- LISTA -->
   <div id="lista"></div>
 
-  <!-- 🔥 DETALHE -->
+  <!-- DETALHE -->
   <div id="detalhe">
 
     <!-- ✅ TOPO COM LOGO -->
@@ -153,7 +152,7 @@
       <h3 class="tituloVerde" id="situacao"></h3>
     </div>
 
-    <!-- ✅ PREVISTO -->
+    <!-- ✅ PREVISTO x REALIZADO -->
     <div class="bloco">
       <h3 class="tituloAzul">Previsto x Realizado</h3>
       <p id="inicio"></p>
@@ -175,7 +174,7 @@
 
 </div>
 
-<!-- ✅ FIREBASE -->
+<!-- ✅ FIREBASE (CORRETO) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -194,16 +193,14 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// ✅ LOGIN
+// LOGIN
 async function login() {
 
   const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
 
   try {
-
-    const userCredential = await auth.signInWithEmailAndPassword(email, senha);
-    const user = userCredential.user;
+    await auth.signInWithEmailAndPassword(email, senha);
 
     document.getElementById("login").style.display = "none";
     document.getElementById("app").style.display = "block";
@@ -216,7 +213,7 @@ async function login() {
 }
 
 
-// ✅ LISTAR FRENTES
+// LISTAR FRENTES
 async function carregarFrentes() {
 
   const lista = document.getElementById("lista");
@@ -237,7 +234,7 @@ async function carregarFrentes() {
 }
 
 
-// ✅ ABRIR DETALHE
+// ABRIR DETALHE
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
@@ -265,7 +262,7 @@ function abrirDetalhe(data) {
 }
 
 
-// ✅ VOLTAR
+// VOLTAR
 function voltar() {
   document.getElementById("lista").style.display = "block";
   document.getElementById("detalhe").style.display = "none";
