@@ -7,6 +7,7 @@
     body {
       margin: 0;
       font-family: Arial;
+      transition: filter 0.3s;
     }
 
     #app.blur {
@@ -24,11 +25,9 @@
       opacity: 0.12;
       font-size: 14px;
       color: rgba(0,0,0,0.3);
-      word-wrap: break-word;
       white-space: pre-wrap;
       display: none;
     }
-
   </style>
 </head>
 
@@ -36,7 +35,6 @@
 
 <div id="app">
 
-  <!-- LOGIN -->
   <div id="login">
     <h1>Login</h1>
 
@@ -46,7 +44,6 @@
     <button onclick="login()">Entrar</button>
   </div>
 
-  <!-- SISTEMA -->
   <div id="sistema" style="display:none;">
     <h1>Bem-vindo 🚀</h1>
     <p>Sistema ativo</p>
@@ -56,10 +53,10 @@
 
 <div id="watermark"></div>
 
-<!-- Firebase -->
-https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js>
-https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js>
-https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js>
+<!-- ✅ SCRIPT CORRETO -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
 
@@ -108,17 +105,17 @@ async function login() {
 
     if (!autorizado) return;
 
-    // ✅ TROCAR TELA
+    // ✅ TROCA DE TELA
     document.getElementById("login").style.display = "none";
     document.getElementById("sistema").style.display = "block";
 
-    // ✅ WATERMARK FORTE (FUNCIONA NO CELULAR)
+    // ✅ WATERMARK (FORÇADA)
     const watermark = document.getElementById("watermark");
     watermark.style.display = "block";
 
-    const texto = email + " | " + new Date().toLocaleString();
-
+    let texto = email + " | " + new Date().toLocaleString();
     let linhas = "";
+
     for (let i = 0; i < 80; i++) {
       linhas += texto + "\n";
     }
@@ -131,8 +128,7 @@ async function login() {
 }
 
 
-// ✅ BLUR MAIS CONFIÁVEL
-
+// ✅ BLUR MELHORADO
 function ativarBlur() {
   document.getElementById("app").classList.add("blur");
 }
@@ -141,21 +137,16 @@ function removerBlur() {
   document.getElementById("app").classList.remove("blur");
 }
 
-// computador
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) ativarBlur();
   else removerBlur();
 });
 
-// mobile + geral
 window.addEventListener("blur", ativarBlur);
 window.addEventListener("focus", removerBlur);
-
-// eventos extras (MELHORAM no celular)
 window.addEventListener("pagehide", ativarBlur);
 window.addEventListener("pageshow", removerBlur);
 
-// fallback forte
 setInterval(() => {
   if (!document.hasFocus()) ativarBlur();
 }, 800);
