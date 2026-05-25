@@ -5,12 +5,19 @@
 </head>
 <body>
 
-<h1>Login</h1>
+<div id="login">
+  <h1>Login</h1>
 
-<input type="email" id="email" placeholder="Email"><br><br>
-<input type="password" id="senha" placeholder="Senha"><br><br>
+  <input type="email" id="email" placeholder="Email"><br><br>
+  <input type="password" id="senha" placeholder="Senha"><br><br>
 
-<button onclick="login()">Entrar</button>
+  <button onclick="login()">Entrar</button>
+</div>
+
+<div id="sistema" style="display:none;">
+  <h1>Bem-vindo ao Sistema 🚀</h1>
+  <p>Você está logado!</p>
+</div>
 
 <div id="watermark"></div>
 
@@ -52,8 +59,6 @@ async function login() {
         device: device
       });
 
-      alert("✅ Dispositivo registrado");
-
     } else {
 
       const data = docSnap.data();
@@ -62,11 +67,13 @@ async function login() {
         alert("🚫 Dispositivo bloqueado");
         return;
       }
-
-      alert("✅ Login autorizado");
     }
 
-    // 👁️ MARCA D’ÁGUA
+    // ✅ MOSTRAR SISTEMA
+    document.getElementById("login").style.display = "none";
+    document.getElementById("sistema").style.display = "block";
+
+    // 👁️ MARCA D'ÁGUA
     const watermark = document.getElementById("watermark");
 
     watermark.innerText = email + " | " + new Date().toLocaleString();
@@ -89,13 +96,8 @@ async function login() {
   }
 }
 
-// 🧊 BLUR AO SAIR DA ABA
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    document.body.style.filter = "blur(8px)";
-  } else {
-    document.body.style.filter = "none";
-  }
+  document.body.style.filter = document.hidden ? "blur(8px)" : "none";
 });
 
 </script>
