@@ -3,15 +3,18 @@
 <head>
   <title>Planejamento em Mãos</title>
 
-  <!-- ✅ FONTE LATO (IMPORTANTE) -->
+  <!-- ✅ RESPONSIVO -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ✅ FONTE LATO -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
   <style>
     body {
       margin: 0;
       font-family: 'Lato', sans-serif;
-      text-align: center;
       background: #f4f6f8;
+      text-align: center;
     }
 
     #app.blur {
@@ -22,13 +25,13 @@
     #topo {
       display: flex;
       align-items: center;
-      background: #ffffff;
+      background: #fff;
       padding: 10px 20px;
       border-bottom: 1px solid #ddd;
     }
 
     #topo img {
-      height: 55px;
+      height: 50px;
     }
 
     #topo h2 {
@@ -44,11 +47,10 @@
       background-size: cover;
       background-position: center;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       color: white;
       font-size: 42px;
-      font-weight: 300;
       text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     }
 
@@ -58,11 +60,11 @@
       width: 300px;
       margin: 10px auto;
       padding: 12px;
-      cursor: pointer;
       background: #1f6e8c;
       color: white;
       border: none;
       border-radius: 5px;
+      cursor: pointer;
       font-size: 16px;
     }
 
@@ -93,8 +95,8 @@
 
     img {
       max-width: 90%;
-      border-radius: 8px;
       margin: 15px 0;
+      border-radius: 8px;
     }
 
     button {
@@ -103,8 +105,42 @@
       background: #2c3e50;
       color: white;
       border: none;
-      cursor: pointer;
       border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* ✅ RESPONSIVO CELULAR */
+    @media (max-width: 768px) {
+
+      #banner {
+        height: 180px;
+        font-size: 24px;
+      }
+
+      #topo h2 {
+        font-size: 16px;
+      }
+
+      #topo img {
+        height: 40px;
+      }
+
+      .tituloAzul {
+        font-size: 18px;
+      }
+
+      .tituloVerde {
+        font-size: 16px;
+      }
+
+      p {
+        font-size: 14px;
+      }
+
+      #lista button {
+        width: 90%;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -128,18 +164,18 @@
   <!-- DETALHE -->
   <div id="detalhe">
 
-    <!-- ✅ TOPO COM LOGO -->
+    <!-- TOPO -->
     <div id="topo">
       <img src="https://i.imgur.com/iZ8gr1i.png">
       <h2>Planejamento em Mãos</h2>
     </div>
 
-    <!-- ✅ BANNER -->
+    <!-- BANNER -->
     <div id="banner">
       <span id="titulo"></span>
     </div>
 
-    <!-- ✅ DADOS -->
+    <!-- DADOS -->
     <div class="bloco">
       <h3 class="tituloAzul">Dados</h3>
       <p id="data"></p>
@@ -147,12 +183,12 @@
       <p id="avanco"></p>
     </div>
 
-    <!-- ✅ SITUAÇÃO -->
+    <!-- SITUAÇÃO -->
     <div class="bloco">
       <h3 class="tituloVerde" id="situacao"></h3>
     </div>
 
-    <!-- ✅ PREVISTO x REALIZADO -->
+    <!-- PREVISTO x REALIZADO -->
     <div class="bloco">
       <h3 class="tituloAzul">Previsto x Realizado</h3>
       <p id="inicio"></p>
@@ -161,7 +197,7 @@
       <img id="grafico">
     </div>
 
-    <!-- ✅ IMAGENS -->
+    <!-- IMAGENS -->
     <div class="bloco">
       <img id="img1">
       <img id="img2">
@@ -174,7 +210,7 @@
 
 </div>
 
-<!-- ✅ FIREBASE (CORRETO) -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -193,14 +229,30 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// LOGIN
+// ✅ LOGIN COM BLOQUEIO
 async function login() {
 
   const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
 
   try {
-    await auth.signInWithEmailAndPassword(email, senha);
+
+    const userCredential = await auth.signInWithEmailAndPassword(email, senha);
+    const user = userCredential.user;
+
+    const device = navigator.userAgent + screen.width + screen.height;
+
+    const ref = db.collection("users_devices").doc(user.uid);
+    const docSnap = await ref.get();
+
+    if (!docSnap.exists) {
+      await ref.set({ device });
+    } else {
+      if (docSnap.data().device !== device) {
+        alert("🚫 Acesso permitido apenas no dispositivo registrado.");
+        return;
+      }
+    }
 
     document.getElementById("login").style.display = "none";
     document.getElementById("app").style.display = "block";
@@ -213,7 +265,7 @@ async function login() {
 }
 
 
-// LISTAR FRENTES
+// ✅ LISTAR FRENTES
 async function carregarFrentes() {
 
   const lista = document.getElementById("lista");
@@ -234,16 +286,14 @@ async function carregarFrentes() {
 }
 
 
-// ABRIR DETALHE
+// ✅ DETALHE
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
   document.getElementById("detalhe").style.display = "block";
 
   document.getElementById("titulo").innerText = data.Nome;
-
-  document.getElementById("banner").style.backgroundImage =
-    "url('" + data.Imagem + "')";
+  document.getElementById("banner").style.backgroundImage = "url('" + data.Imagem + "')";
 
   document.getElementById("data").innerText = data["Data Prevista"];
   document.getElementById("total").innerText = "Total: " + data.Total;
@@ -262,7 +312,7 @@ function abrirDetalhe(data) {
 }
 
 
-// VOLTAR
+// ✅ VOLTAR
 function voltar() {
   document.getElementById("lista").style.display = "block";
   document.getElementById("detalhe").style.display = "none";
