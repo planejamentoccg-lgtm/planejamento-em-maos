@@ -4,15 +4,18 @@
   <title>Planejamento em Mãos</title>
 
   <style>
-    .blur {
+    body.blur {
       filter: blur(10px);
     }
-  </style>
 
+    body {
+      transition: filter 0.3s ease;
+    }
+  </style>
 </head>
 <body>
 
-<!-- TELA LOGIN -->
+<!-- LOGIN -->
 <div id="login">
   <h1>Login</h1>
 
@@ -28,7 +31,7 @@
   <p>Você está logado.</p>
 </div>
 
-<!-- Firebase -->
+<!-- FIREBASE (CORRIGIDO ✅) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -47,7 +50,8 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// LOGIN
+
+// ✅ LOGIN
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -80,12 +84,12 @@ async function login() {
 
     } catch (erroBanco) {
       console.log("Erro no banco:", erroBanco);
-      alert("⚠️ Falha ao consultar banco (seguindo login)");
+      alert("⚠️ Falha no banco (seguindo login)");
     }
 
     if (!autorizado) return;
 
-    // ✅ TROCAR TELA
+    // ✅ TROCA DE TELA
     document.getElementById("login").style.display = "none";
     document.getElementById("sistema").style.display = "block";
 
@@ -94,7 +98,8 @@ async function login() {
   }
 }
 
-// 🧊 BLUR PROFISSIONAL
+
+// 🧊 BLUR PROFISSIONAL (melhor possível no web)
 
 function ativarBlur() {
   document.body.classList.add("blur");
@@ -104,22 +109,29 @@ function removerBlur() {
   document.body.classList.remove("blur");
 }
 
-// computador
+// computador (troca de aba)
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) ativarBlur();
-  else removerBlur();
+  if (document.hidden) {
+    ativarBlur();
+  } else {
+    removerBlur();
+  }
 });
 
-// celular (tentativa)
+// foco geral
 window.addEventListener("blur", ativarBlur);
 window.addEventListener("focus", removerBlur);
 
-// fallback
+// eventos extras (mobile compat)
+window.addEventListener("pagehide", ativarBlur);
+window.addEventListener("pageshow", removerBlur);
+
+// fallback (garantia)
 setInterval(() => {
   if (!document.hasFocus()) {
     ativarBlur();
   }
-}, 2000);
+}, 1500);
 
 </script>
 
