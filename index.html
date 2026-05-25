@@ -2,9 +2,17 @@
 <html>
 <head>
   <title>Planejamento em Mãos</title>
+
+  <style>
+    .blur {
+      filter: blur(10px);
+    }
+  </style>
+
 </head>
 <body>
 
+<!-- TELA LOGIN -->
 <div id="login">
   <h1>Login</h1>
 
@@ -14,19 +22,20 @@
   <button onclick="login()">Entrar</button>
 </div>
 
+<!-- SISTEMA -->
 <div id="sistema" style="display:none;">
   <h1>Bem-vindo ao Sistema 🚀</h1>
-  <p>Você está logado!</p>
+  <p>Você está logado.</p>
 </div>
 
-<div id="watermark"></div>
-
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
 
+// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDabKVmo13MIUbtVx2O0lSJMuUT7X1DE-k",
   authDomain: "cortex-planejamento.firebaseapp.com",
@@ -38,6 +47,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// LOGIN
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -70,48 +80,46 @@ async function login() {
 
     } catch (erroBanco) {
       console.log("Erro no banco:", erroBanco);
-      alert("⚠️ Banco falhou, mas login continuará (modo seguro)");
+      alert("⚠️ Falha ao consultar banco (seguindo login)");
     }
 
     if (!autorizado) return;
 
-    // ✅ FORÇAR TROCA DE TELA
-    const loginDiv = document.getElementById("login");
-    const sistemaDiv = document.getElementById("sistema");
-
-    if (loginDiv && sistemaDiv) {
-      loginDiv.style.display = "none";
-      sistemaDiv.style.display = "block";
-    } else {
-      alert("Erro ao carregar sistema");
-    }
-
-    // ✅ MARCA D'ÁGUA
-    const watermark = document.getElementById("watermark");
-    watermark.innerText = email + " | " + new Date().toLocaleString();
-
-    watermark.style.position = "fixed";
-    watermark.style.top = "0";
-    watermark.style.left = "0";
-    watermark.style.width = "100%";
-    watermark.style.height = "100%";
-    watermark.style.opacity = "0.08";
-    watermark.style.fontSize = "28px";
-    watermark.style.display = "flex";
-    watermark.style.alignItems = "center";
-    watermark.style.justifyContent = "center";
-    watermark.style.transform = "rotate(-30deg)";
-    watermark.style.pointerEvents = "none";
+    // ✅ TROCAR TELA
+    document.getElementById("login").style.display = "none";
+    document.getElementById("sistema").style.display = "block";
 
   } catch (e) {
     alert("Erro: " + e.message);
   }
 }
 
-// blur
+// 🧊 BLUR PROFISSIONAL
+
+function ativarBlur() {
+  document.body.classList.add("blur");
+}
+
+function removerBlur() {
+  document.body.classList.remove("blur");
+}
+
+// computador
 document.addEventListener("visibilitychange", () => {
-  document.body.style.filter = document.hidden ? "blur(8px)" : "none";
+  if (document.hidden) ativarBlur();
+  else removerBlur();
 });
+
+// celular (tentativa)
+window.addEventListener("blur", ativarBlur);
+window.addEventListener("focus", removerBlur);
+
+// fallback
+setInterval(() => {
+  if (!document.hasFocus()) {
+    ativarBlur();
+  }
+}, 2000);
 
 </script>
 
