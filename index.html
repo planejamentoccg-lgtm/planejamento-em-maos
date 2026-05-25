@@ -54,10 +54,8 @@
 
   <h1>Frentes de Serviço</h1>
 
-  <!-- LISTA -->
   <div id="lista"></div>
 
-  <!-- DETALHE -->
   <div id="detalhe">
     <h2 id="nome"></h2>
 
@@ -80,7 +78,6 @@
 
 <script>
 
-// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDabKVmo13MIUbtVx2O0lSJMuUT7X1DE-k",
   authDomain: "cortex-planejamento.firebaseapp.com",
@@ -129,58 +126,52 @@ async function login() {
 }
 
 
-// ✅ CARREGAR LISTA (COM DEBUG)
+// ✅ CARREGAR LISTA
 async function carregarFrentes() {
-
-  console.log("🔥 Tentando carregar frentes...");
 
   const lista = document.getElementById("lista");
   lista.innerHTML = "";
 
-  try {
+  const snapshot = await db.collection("Frentes").get();
 
-    const snapshot = await db.collection("Frentes").get();
+  snapshot.forEach(doc => {
 
-    console.log("📦 Snapshot:", snapshot);
+    const data = doc.data();
 
-    if (snapshot.empty) {
-      console.log("❌ Nenhum dado encontrado no Firestore");
-      lista.innerHTML = "<p>Nenhuma frente encontrada</p>";
-      return;
-    }
+    const btn = document.createElement("button");
 
-    snapshot.forEach(doc => {
+    btn.innerText = data.Nome;
 
-      const data = doc.data();
+    btn.onclick = () => abrirDetalhe(data);
 
-      console.log("📄 Documento:", data);
+    lista.appendChild(btn);
 
-      const btn = document.createElement("button");
-
-      btn.innerText = data.Nome;
-
-      btn.onclick = () => abrirDetalhe(data);
-
-      lista.appendChild(btn);
-
-    });
-
-  } catch (erro) {
-    console.log("❌ ERRO AO ACESSAR FIRESTORE:", erro);
-    alert("Erro ao carregar dados do banco");
-  }
+  });
 
 }
 
 
-// ✅ DETALHE
+// ✅ DETALHE (COM CORREÇÃO DA IMAGEM)
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
   document.getElementById("detalhe").style.display = "block";
 
   document.getElementById("nome").innerText = data.Nome;
-  document.getElementById("imagem").src = data.Imagem;
+
+  const img = document.getElementById("imagem");
+
+  // fallback se não carregar
+  img.onerror = function () {
+    img.src = "https://via.placeholder.com/400x300?text=Imagem+não+carregou";
+  };
+
+  // força atualização da imagem
+  img.src = "";
+  setTimeout(() => {
+    img.src = data.Imagem;
+  }, 100);
+
   document.getElementById("data").innerText = "Data: " + data["Data Prevista"];
   document.getElementById("total").innerText = "Total: " + data.Total;
   document.getElementById("avanco").innerText = "Avanço: " + data["Avanço"];
@@ -199,10 +190,12 @@ function voltar() {
 
 // ✅ BLUR
 document.addEventListener("visibilitychange", () => {
+  const app = document.getElementById("app");
+
   if (document.hidden) {
-    document.getElementById("app").classList.add("blur");
+    app.classList.add("blur");
   } else {
-    document.getElementById("app").classList.remove("blur");
+    app.classList.remove("blur");
   }
 });
 
@@ -210,4 +203,3 @@ document.addEventListener("visibilitychange", () => {
 
 </body>
 </html>
-
