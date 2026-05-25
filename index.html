@@ -11,29 +11,69 @@
     }
 
     #app.blur {
-      filter: blur(10px);
+      filter: blur(8px);
     }
 
+    /* TOPO */
+    #topo {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 10px;
+    }
+
+    #topo img {
+      height: 50px;
+    }
+
+    #topo h2 {
+      margin-left: 15px;
+      font-weight: 400;
+    }
+
+    /* BANNER */
+    #banner {
+      height: 250px;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 40px;
+    }
+
+    /* LISTA */
     #lista button {
       display: block;
       width: 300px;
       margin: 10px auto;
       padding: 10px;
       cursor: pointer;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      background: #f5f5f5;
     }
 
+    /* DETALHE */
     #detalhe {
       display: none;
-      padding: 20px;
+    }
+
+    .bloco {
+      padding: 25px;
+    }
+
+    .tituloAzul {
+      color: #1f6e8c;
+    }
+
+    .tituloVerde {
+      color: green;
     }
 
     img {
       max-width: 90%;
-      margin-top: 15px;
+      margin: 15px 0;
     }
+
   </style>
 </head>
 
@@ -42,36 +82,68 @@
 <!-- LOGIN -->
 <div id="login">
   <h1>Login</h1>
-
-  <input type="email" id="email" placeholder="Email"><br><br>
-  <input type="password" id="senha" placeholder="Senha"><br><br>
-
+  <input type="email" id="email"><br><br>
+  <input type="password" id="senha"><br><br>
   <button onclick="login()">Entrar</button>
 </div>
 
 <!-- APP -->
 <div id="app" style="display:none;">
 
-  <h1>Frentes de Serviço</h1>
-
+  <!-- LISTA -->
   <div id="lista"></div>
 
+  <!-- DETALHE -->
   <div id="detalhe">
-    <h2 id="nome"></h2>
 
-    <img id="imagem">
+    <!-- TOPO -->
+    <div id="topo">
+      <img src="https://via.placeholder.com/100">
+      <h2>Planejamento em Mãos</h2>
+    </div>
 
-    <p id="data"></p>
-    <p id="total"></p>
-    <p id="avanco"></p>
+    <!-- BANNER -->
+    <div id="banner">
+      <span id="titulo"></span>
+    </div>
 
-    <br>
+    <!-- DADOS -->
+    <div class="bloco">
+      <h3 class="tituloAzul">Dados</h3>
+      <p id="data"></p>
+      <p id="total"></p>
+      <p id="avanco"></p>
+    </div>
+
+    <!-- SITUAÇÃO -->
+    <div class="bloco">
+      <h3 class="tituloVerde" id="situacao"></h3>
+    </div>
+
+    <!-- PREVISTO x REALIZADO -->
+    <div class="bloco">
+      <h3 class="tituloAzul">Previsto x Realizado</h3>
+      <p id="inicio"></p>
+      <p id="previsto"></p>
+      <p id="realizado"></p>
+
+      <img id="grafico">
+    </div>
+
+    <!-- IMAGENS -->
+    <div class="bloco">
+      <img id="img1">
+      <img id="img2">
+      <img id="img3">
+    </div>
+
     <button onclick="voltar()">Voltar</button>
+
   </div>
 
 </div>
 
-<!-- ✅ FIREBASE CORRETO -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -90,7 +162,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// ✅ LOGIN
+// LOGIN
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -110,7 +182,7 @@ async function login() {
       await ref.set({ device: device });
     } else {
       if (docSnap.data().device !== device) {
-        alert("🚫 Dispositivo bloqueado");
+        alert("Dispositivo bloqueado");
         return;
       }
     }
@@ -126,11 +198,11 @@ async function login() {
 }
 
 
-// ✅ CARREGAR LISTA
+// LISTA DE FRENTES
 async function carregarFrentes() {
 
   const lista = document.getElementById("lista");
-  lista.innerHTML = "";
+  lista.innerHTML = "<h1>Frentes de Serviço</h1>";
 
   const snapshot = await db.collection("Frentes").get();
 
@@ -139,47 +211,58 @@ async function carregarFrentes() {
     const data = doc.data();
 
     const btn = document.createElement("button");
-
     btn.innerText = data.Nome;
-
     btn.onclick = () => abrirDetalhe(data);
 
     lista.appendChild(btn);
 
   });
-
 }
 
 
-// ✅ DETALHE (COM CORREÇÃO DA IMAGEM)
+// ABRIR DETALHE
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
   document.getElementById("detalhe").style.display = "block";
 
-  document.getElementById("nome").innerText = data.Nome;
+  document.getElementById("titulo").innerText = data.Nome;
 
-  const img = document.getElementById("imagem");
+  // BANNER
+  document.getElementById("banner").style.backgroundImage =
+    "url('" + data.Imagem + "')";
 
-  // fallback se não carregar
-  img.onerror = function () {
-    img.src = "https://via.placeholder.com/400x300?text=Imagem+não+carregou";
-  };
+  document.getElementById("data").innerText =
+    data["Data Prevista"];
 
-  // força atualização da imagem
-  img.src = "";
-  setTimeout(() => {
-    img.src = data.Imagem;
-  }, 100);
+  document.getElementById("total").innerText =
+    "Total: " + data.Total;
 
-  document.getElementById("data").innerText = "Data: " + data["Data Prevista"];
-  document.getElementById("total").innerText = "Total: " + data.Total;
-  document.getElementById("avanco").innerText = "Avanço: " + data["Avanço"];
+  document.getElementById("avanco").innerText =
+    "Avanço: " + data["Avanço"];
+
+  document.getElementById("situacao").innerText =
+    data.Situacao || "";
+
+  document.getElementById("inicio").innerText =
+    data.Inicio || "";
+
+  document.getElementById("previsto").innerText =
+    data.Previsto || "";
+
+  document.getElementById("realizado").innerText =
+    data.Realizado || "";
+
+  // IMAGENS
+  document.getElementById("grafico").src = data.Grafico || "";
+  document.getElementById("img1").src = data.Imagem1 || "";
+  document.getElementById("img2").src = data.Imagem2 || "";
+  document.getElementById("img3").src = data.Imagem3 || "";
 
 }
 
 
-// ✅ VOLTAR
+// VOLTAR
 function voltar() {
 
   document.getElementById("lista").style.display = "block";
@@ -188,7 +271,7 @@ function voltar() {
 }
 
 
-// ✅ BLUR
+// BLUR
 document.addEventListener("visibilitychange", () => {
   const app = document.getElementById("app");
 
