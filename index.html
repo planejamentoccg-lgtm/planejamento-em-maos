@@ -73,13 +73,14 @@
 
 </div>
 
-<!-- FIREBASE ✅ -->
+<!-- ✅ FIREBASE CORRETO -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
 
+// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDabKVmo13MIUbtVx2O0lSJMuUT7X1DE-k",
   authDomain: "cortex-planejamento.firebaseapp.com",
@@ -128,32 +129,51 @@ async function login() {
 }
 
 
-// ✅ CARREGAR LISTA
+// ✅ CARREGAR LISTA (COM DEBUG)
 async function carregarFrentes() {
+
+  console.log("🔥 Tentando carregar frentes...");
 
   const lista = document.getElementById("lista");
   lista.innerHTML = "";
 
-  const snapshot = await db.collection("Frentes").get();
+  try {
 
-  snapshot.forEach(doc => {
+    const snapshot = await db.collection("Frentes").get();
 
-    const data = doc.data();
+    console.log("📦 Snapshot:", snapshot);
 
-    const btn = document.createElement("button");
+    if (snapshot.empty) {
+      console.log("❌ Nenhum dado encontrado no Firestore");
+      lista.innerHTML = "<p>Nenhuma frente encontrada</p>";
+      return;
+    }
 
-    btn.innerText = data.Nome;
+    snapshot.forEach(doc => {
 
-    btn.onclick = () => abrirDetalhe(data);
+      const data = doc.data();
 
-    lista.appendChild(btn);
+      console.log("📄 Documento:", data);
 
-  });
+      const btn = document.createElement("button");
+
+      btn.innerText = data.Nome;
+
+      btn.onclick = () => abrirDetalhe(data);
+
+      lista.appendChild(btn);
+
+    });
+
+  } catch (erro) {
+    console.log("❌ ERRO AO ACESSAR FIRESTORE:", erro);
+    alert("Erro ao carregar dados do banco");
+  }
 
 }
 
 
-// ✅ ABRIR DETALHE
+// ✅ DETALHE
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
@@ -190,3 +210,4 @@ document.addEventListener("visibilitychange", () => {
 
 </body>
 </html>
+
