@@ -17,11 +17,6 @@
       text-align: center;
     }
 
-    #app.blur {
-      filter: blur(8px);
-    }
-
-    /* ✅ TOPO */
     #topo {
       display: flex;
       align-items: center;
@@ -38,10 +33,8 @@
       margin-left: 15px;
       font-weight: 400;
       color: #2c3e50;
-      font-size: 22px;
     }
 
-    /* ✅ BANNER */
     #banner {
       height: 250px;
       background-size: cover;
@@ -50,11 +43,10 @@
       justify-content: center;
       align-items: center;
       color: white;
-      font-size: 42px;
+      font-size: 38px;
       text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     }
 
-    /* ✅ LISTA */
     #lista button {
       display: block;
       width: 300px;
@@ -65,7 +57,6 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 16px;
     }
 
     #detalhe {
@@ -78,18 +69,11 @@
 
     .tituloAzul {
       color: #1f6e8c;
-      font-size: 22px;
     }
 
     .tituloVerde {
       color: #2ecc71;
-      font-size: 20px;
       font-weight: bold;
-    }
-
-    p {
-      margin: 6px;
-      font-size: 16px;
     }
 
     img {
@@ -108,37 +92,18 @@
       cursor: pointer;
     }
 
-    /* ✅ RESPONSIVO CELULAR */
     @media (max-width: 768px) {
-
       #banner {
         height: 180px;
         font-size: 24px;
-      }
-
-      #topo h2 {
-        font-size: 16px;
       }
 
       #topo img {
         height: 40px;
       }
 
-      .tituloAzul {
-        font-size: 18px;
-      }
-
-      .tituloVerde {
-        font-size: 16px;
-      }
-
-      p {
-        font-size: 14px;
-      }
-
       #lista button {
         width: 90%;
-        font-size: 14px;
       }
     }
   </style>
@@ -161,45 +126,17 @@
 
   <div id="detalhe">
 
-    <!-- ✅ TOPO COM LOGO -->
     <div id="topo">
       <img src="https://i.imgur.com/iZ8gr1i.png">
       <h2>Planejamento em Mãos</h2>
     </div>
 
-    <!-- ✅ BANNER -->
     <div id="banner">
       <span id="titulo"></span>
     </div>
 
-    <!-- ✅ DADOS -->
-    <div class="bloco">
-      <h3 class="tituloAzul">Dados</h3>
-      <p id="data"></p>
-      <p id="total"></p>
-      <p id="avanco"></p>
-    </div>
-
-    <!-- ✅ SITUAÇÃO -->
-    <div class="bloco">
-      <h3 class="tituloVerde" id="situacao"></h3>
-    </div>
-
-    <!-- ✅ PREVISTO -->
-    <div class="bloco">
-      <h3 class="tituloAzul">Previsto x Realizado</h3>
-      <p id="inicio"></p>
-      <p id="previsto"></p>
-      <p id="realizado"></p>
-      <img id="grafico">
-    </div>
-
-    <!-- ✅ IMAGENS -->
-    <div class="bloco">
-      <img id="img1">
-      <img id="img2">
-      <img id="img3">
-    </div>
+    <!-- 🔥 CONTAINER DAS SEÇÕES -->
+    <div id="conteudoSecoes"></div>
 
     <button onclick="voltar()">Voltar</button>
 
@@ -207,7 +144,7 @@
 
 </div>
 
-<!-- ✅ FIREBASE -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -226,7 +163,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// ✅ LOGIN COM BLOQUEIO REAL
+// 🔐 LOGIN COM BLOQUEIO
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -243,19 +180,12 @@ async function login() {
     const docSnap = await ref.get();
 
     if (!docSnap.exists) {
-
       await ref.set({ device });
 
-    } else {
-
-      if (docSnap.data().device !== device) {
-
-        alert("🚫 Este usuário já está vinculado a outro dispositivo.");
-
-        await auth.signOut(); // ✅ BLOQUEIO REAL
-
-        return;
-      }
+    } else if (docSnap.data().device !== device) {
+      alert("🚫 Usuário vinculado a outro dispositivo");
+      await auth.signOut();
+      return;
     }
 
     document.getElementById("login").style.display = "none";
@@ -269,11 +199,11 @@ async function login() {
 }
 
 
-// ✅ LISTAR FRENTES
+// LISTA
 async function carregarFrentes() {
 
   const lista = document.getElementById("lista");
-  lista.innerHTML = "<h1>Frentes de Serviço</h1>";
+  lista.innerHTML = "<h1>Frentes</h1>";
 
   const snapshot = await db.collection("Frentes").get();
 
@@ -290,33 +220,57 @@ async function carregarFrentes() {
 }
 
 
-// ✅ DETALHE
+// 🔥 DETALHE COM SEÇÕES
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
   document.getElementById("detalhe").style.display = "block";
 
   document.getElementById("titulo").innerText = data.Nome;
-  document.getElementById("banner").style.backgroundImage = "url('" + data.Imagem + "')";
+  document.getElementById("banner").style.backgroundImage =
+    "url('" + data.Imagem + "')";
 
-  document.getElementById("data").innerText = data["Data Prevista"];
-  document.getElementById("total").innerText = "Total: " + data.Total;
-  document.getElementById("avanco").innerText = "Avanço: " + data["Avanço"];
+  const container = document.getElementById("conteudoSecoes");
+  container.innerHTML = "";
 
-  document.getElementById("situacao").innerText = data.Situacao || "";
+  function criarSecao(secao, titulo) {
 
-  document.getElementById("inicio").innerText = data.Inicio || "";
-  document.getElementById("previsto").innerText = data.Previsto || "";
-  document.getElementById("realizado").innerText = data.Realizado || "";
+    if (!secao) return;
 
-  document.getElementById("grafico").src = data.Grafico || "";
-  document.getElementById("img1").src = data.Imagem1 || "";
-  document.getElementById("img2").src = data.Imagem2 || "";
-  document.getElementById("img3").src = data.Imagem3 || "";
+    const div = document.createElement("div");
+    div.className = "bloco";
+
+    div.innerHTML = `
+      <h2 class="tituloAzul">${titulo}</h2>
+
+      <p>${secao["Data Prevista"] || ""}</p>
+      <p>Total: ${secao.Total || ""}</p>
+      <p>Avanço: ${secao["Avanço"] || ""}</p>
+
+      <p class="tituloVerde">${secao.Situacao || ""}</p>
+
+      <p>${secao.Inicio || ""}</p>
+      <p>${secao.Previsto || ""}</p>
+      <p>${secao.Realizado || ""}</p>
+
+      ${secao.Grafico || ""}
+      <br>
+
+      ${secao.Imagem1 || ""}
+      ${secao.Imagem2 || ""}
+      ${secao.Imagem3 || ""}
+    `;
+
+    container.appendChild(div);
+  }
+
+  criarSecao(data.LadoSul, "LADO SUL");
+  criarSecao(data.LadoOeste, "LADO OESTE");
+
 }
 
 
-// ✅ VOLTAR
+// VOLTAR
 function voltar() {
   document.getElementById("lista").style.display = "block";
   document.getElementById("detalhe").style.display = "none";
