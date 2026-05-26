@@ -3,6 +3,7 @@
 <head>
   <title>Planejamento em Mãos</title>
 
+  <!-- ✅ RESPONSIVO -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- ✅ FONTE LATO -->
@@ -83,6 +84,16 @@
       border-radius: 8px;
     }
 
+    button {
+      margin: 20px;
+      padding: 10px 20px;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
     @media (max-width: 768px) {
       #banner {
         height: 160px;
@@ -102,6 +113,7 @@
 
 <body>
 
+<!-- LOGIN -->
 <div id="login">
   <h1>Login</h1>
   <input type="email" id="email"><br><br>
@@ -109,22 +121,25 @@
   <button onclick="login()">Entrar</button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
 
   <div id="lista"></div>
 
   <div id="detalhe">
 
+    <!-- TOPO -->
     <div id="topo">
       <img src="https://i.imgur.com/iZ8gr1i.png">
       <h2>Planejamento em Mãos</h2>
     </div>
 
+    <!-- BANNER -->
     <div id="banner">
       <span id="titulo"></span>
     </div>
 
-    <!-- ✅ AQUI VÃO AS SEÇÕES -->
+    <!-- CONTEÚDO DAS SEÇÕES -->
     <div id="conteudoSecoes"></div>
 
     <button onclick="voltar()">Voltar</button>
@@ -133,6 +148,7 @@
 
 </div>
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -151,7 +167,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// ✅ LOGIN COM BLOQUEIO
+// 🔐 LOGIN COM BLOQUEIO
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -169,7 +185,6 @@ async function login() {
 
     if (!docSnap.exists) {
       await ref.set({ device });
-
     } else if (docSnap.data().device !== device) {
       alert("🚫 Usuário vinculado a outro dispositivo");
       await auth.signOut();
@@ -208,31 +223,39 @@ async function carregarFrentes() {
 }
 
 
-// 🔥 CRIAR SEÇÕES (VERSÃO CORRIGIDA)
+// ✅ FUNÇÃO INTELIGENTE (SEM undefined)
 function criarSecao(secao, titulo) {
 
   if (!secao) return "";
 
-  return `
-    <div class="bloco">
+  let html = `<div class="bloco">`;
 
-      <h2 class="tituloAzul">${titulo}</h2>
+  html += `<h2 class="tituloAzul">${titulo}</h2>`;
 
-      <h3 class="tituloAzul">Dados</h3>
-      <p>${secao["Data Prevista"] || ""}</p>
-      <p>Total: ${secao.Total || ""}</p>
-      <p>Avanço: ${secao["Avanço"] || ""}</p>
+  if (secao["Data Prevista"])
+    html += `<p>${secao["Data Prevista"]}</p>`;
 
-      <h3 class="tituloVerde">${secao.Situacao || ""}</h3>
+  if (secao.Total)
+    html += `<p>Total: ${secao.Total}</p>`;
 
-      <h3 class="tituloAzul">Previsto x Realizado</h3>
-      <p>${secao.Inicio || ""}</p>
-      <p>${secao.Previsto || ""}</p>
-      <p>${secao.Realizado || ""}</p>
+  if (secao["Avanço"])
+    html += `<p>Avanço: ${secao["Avanço"]}</p>`;
 
-      ${secao.Grafico ? `<img src="${secao.Grafico}gem2}    ${secao.Imagem3 ? `<img src="${secao.Imagem
-    </div>
-  `;
+  if (secao.Situacao)
+    html += `<h3 class="tituloVerde">${secao.Situacao}</h3>`;
+
+  if (secao.Inicio || secao.Previsto || secao.Realizado) {
+    html += `<h3 class="tituloAzul">Previsto x Realizado</h3>`;
+    if (secao.Inicio) html += `<p>${secao.Inicio}</p>`;
+    if (secao.Previsto) html += `<p>${secao.Previsto}</p>`;
+    if (secao.Realizado) html += `<p>${secao.Realizado}</p>`;
+  }
+
+  if (secao.Grafico)
+    html += `<img src="${secao.Graficosrc="${secao.Imagem2(secao.Imagem3)
+    html += `<img src="${secao.Imagem3l += `</div>`;
+
+  return html;
 }
 
 
@@ -243,15 +266,16 @@ function abrirDetalhe(data) {
   document.getElementById("detalhe").style.display = "block";
 
   document.getElementById("titulo").innerText = data.Nome || "";
+
   document.getElementById("banner").style.backgroundImage =
     "url('" + data.Imagem + "')";
 
-  const html =
-    criarSecao(data.LadoSul, "LADO SUL") +
-    criarSecao(data.LadoOeste, "LADO OESTE");
+  let html = "";
+
+  html += criarSecao(data.LadoSul, "LADO SUL");
+  html += criarSecao(data.LadoOeste, "LADO OESTE");
 
   document.getElementById("conteudoSecoes").innerHTML = html;
-
 }
 
 
