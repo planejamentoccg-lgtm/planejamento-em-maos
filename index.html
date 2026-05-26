@@ -3,10 +3,9 @@
 <head>
   <title>Planejamento em Mãos</title>
 
-  <!-- ✅ RESPONSIVO -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ✅ FONTE LATO -->
+  <!-- FONTE LATO -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -68,7 +67,7 @@
       border-bottom: 1px solid #ddd;
     }
 
-    .tituloAzul {
+    .tituloSecao {
       color: #1f6e8c;
       font-size: 22px;
     }
@@ -76,6 +75,7 @@
     .tituloVerde {
       color: #2ecc71;
       font-weight: bold;
+      margin-top: 10px;
     }
 
     img {
@@ -128,18 +128,15 @@
 
   <div id="detalhe">
 
-    <!-- TOPO -->
     <div id="topo">
       <img src="https://i.imgur.com/iZ8gr1i.png">
       <h2>Planejamento em Mãos</h2>
     </div>
 
-    <!-- BANNER -->
     <div id="banner">
       <span id="titulo"></span>
     </div>
 
-    <!-- CONTEÚDO DAS SEÇÕES -->
     <div id="conteudoSecoes"></div>
 
     <button onclick="voltar()">Voltar</button>
@@ -162,12 +159,11 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// 🔐 LOGIN COM BLOQUEIO
+// LOGIN COM BLOQUEIO
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -202,7 +198,7 @@ async function login() {
 }
 
 
-// ✅ LISTAR FRENTES
+// LISTAR FRENTES
 async function carregarFrentes() {
 
   const lista = document.getElementById("lista");
@@ -223,43 +219,35 @@ async function carregarFrentes() {
 }
 
 
-// ✅ FUNÇÃO INTELIGENTE (SEM undefined)
+// CRIAR BLOCO SEM UNDEFINED
 function criarSecao(secao, titulo) {
 
   if (!secao) return "";
 
   let html = `<div class="bloco">`;
 
-  html += `<h2 class="tituloAzul">${titulo}</h2>`;
+  html += `<h2 class="tituloSecao">${titulo}</h2>`;
 
-  if (secao["Data Prevista"])
-    html += `<p>${secao["Data Prevista"]}</p>`;
+  if (secao["Data Prevista"]) html += `<p>${secao["Data Prevista"]}</p>`;
+  if (secao.Total) html += `<p>Total: ${secao.Total}</p>`;
+  if (secao["Avanço"]) html += `<p>Avanço: ${secao["Avanço"]}</p>`;
 
-  if (secao.Total)
-    html += `<p>Total: ${secao.Total}</p>`;
-
-  if (secao["Avanço"])
-    html += `<p>Avanço: ${secao["Avanço"]}</p>`;
-
-  if (secao.Situacao)
-    html += `<h3 class="tituloVerde">${secao.Situacao}</h3>`;
+  if (secao.Situacao) html += `<div class="tituloVerde">${secao.Situacao}</div>`;
 
   if (secao.Inicio || secao.Previsto || secao.Realizado) {
-    html += `<h3 class="tituloAzul">Previsto x Realizado</h3>`;
+    html += `<h3>Previsto x Realizado</h3>`;
     if (secao.Inicio) html += `<p>${secao.Inicio}</p>`;
     if (secao.Previsto) html += `<p>${secao.Previsto}</p>`;
     if (secao.Realizado) html += `<p>${secao.Realizado}</p>`;
   }
 
-  if (secao.Grafico)
-    html += `<img src="${secao.Graficosrc="${secao.Imagem2(secao.Imagem3)
-    html += `<img src="${secao.Imagem3l += `</div>`;
+  if (secao.Grafico) html += `<img src="${secao.Grafico}ao.Imagem(secao.Imagem3) html += `<img src="${secao.Imagem3} += `</div>`;
 
   return html;
 }
 
 
-// ✅ ABRIR DETALHE
+// ABRIR DETALHE
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
@@ -271,7 +259,6 @@ function abrirDetalhe(data) {
     "url('" + data.Imagem + "')";
 
   let html = "";
-
   html += criarSecao(data.LadoSul, "LADO SUL");
   html += criarSecao(data.LadoOeste, "LADO OESTE");
 
@@ -279,7 +266,7 @@ function abrirDetalhe(data) {
 }
 
 
-// ✅ VOLTAR
+// VOLTAR
 function voltar() {
   document.getElementById("lista").style.display = "block";
   document.getElementById("detalhe").style.display = "none";
