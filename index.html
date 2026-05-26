@@ -6,8 +6,13 @@
   <!-- RESPONSIVO -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ✅ FONTE LATO (CORRETO) -->
+  <!-- ✅ FONTE LATO -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- ✅ FIREBASE (CORRETO) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <style>
     body {
@@ -22,7 +27,6 @@
       align-items: center;
       background: #fff;
       padding: 10px 20px;
-      border-bottom: 1px solid #ddd;
     }
 
     #topo img {
@@ -30,81 +34,34 @@
     }
 
     #topo h2 {
-      margin-left: 15px;
-      color: #2c3e50;
-      font-weight: 400;
+      margin-left: 10px;
     }
 
     #banner {
-      height: 240px;
+      height: 200px;
       background-size: cover;
       background-position: center;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: white;
-      font-size: 36px;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+      font-size: 28px;
     }
 
     #lista button {
       display: block;
       width: 300px;
       margin: 10px auto;
-      padding: 12px;
-      background: #1f6e8c;
-      color: white;
-      border: none;
-      border-radius: 5px;
+      padding: 10px;
       cursor: pointer;
-    }
-
-    #detalhe {
-      display: none;
     }
 
     .bloco {
-      padding: 25px;
+      padding: 20px;
       border-bottom: 1px solid #ddd;
     }
 
-    .tituloSecao {
-      color: #1f6e8c;
-      font-size: 22px;
-    }
-
-    .tituloVerde {
-      color: #2ecc71;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    img {
-      max-width: 90%;
-      border-radius: 8px;
-      margin: 10px 0;
-    }
-
-    button {
-      margin: 20px;
-      padding: 10px 20px;
-      background: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
     @media (max-width: 768px) {
-      #banner {
-        height: 160px;
-        font-size: 24px;
-      }
-
-      #topo img {
-        height: 40px;
-      }
-
       #lista button {
         width: 90%;
       }
@@ -116,9 +73,9 @@
 
 <!-- LOGIN -->
 <div id="login">
-  <h1>Login</h1>
-  <input type="email" id="email"><br><br>
-  <input type="password" id="senha"><br><br>
+  <h2>Login</h2>
+  <input id="email" type="email"><br><br>
+  <input id="senha" type="password"><br><br>
   <button onclick="login()">Entrar</button>
 </div>
 
@@ -127,7 +84,7 @@
 
   <div id="lista"></div>
 
-  <div id="detalhe">
+  <div id="detalhe" style="display:none;">
 
     <div id="topo">
       <img src="https://i.imgur.com/iZ8gr1i.png">
@@ -138,18 +95,13 @@
       <span id="titulo"></span>
     </div>
 
-    <div id="conteudoSecoes"></div>
+    <div id="conteudo"></div>
 
     <button onclick="voltar()">Voltar</button>
 
   </div>
 
 </div>
-
-<!-- ✅ FIREBASE (CORRETO AGORA) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
 
@@ -165,33 +117,33 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// LOGIN COM BLOQUEIO
+// ✅ LOGIN
 async function login() {
 
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
+  const email = email.value;
+  const senha = senha.value;
 
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, senha);
-    const user = userCredential.user;
+    const cred = await auth.signInWithEmailAndPassword(email, senha);
+    const user = cred.user;
 
-    const device = navigator.userAgent + screen.width + screen.height;
+    const device = navigator.userAgent;
 
     const ref = db.collection("users_devices").doc(user.uid);
-    const docSnap = await ref.get();
+    const snap = await ref.get();
 
-    if (!docSnap.exists) {
+    if (!snap.exists) {
       await ref.set({ device });
-    } else if (docSnap.data().device !== device) {
-      alert("🚫 Usuário já vinculado a outro dispositivo");
+    } else if (snap.data().device !== device) {
+      alert("🚫 Bloqueado em outro dispositivo");
       await auth.signOut();
       return;
     }
 
-    document.getElementById("login").style.display = "none";
-    document.getElementById("app").style.display = "block";
+    login.style.display = "none";
+    app.style.display = "block";
 
-    carregarFrentes();
+    carregar();
 
   } catch (e) {
     alert(e.message);
@@ -199,78 +151,57 @@ async function login() {
 }
 
 
-// LISTAR FRENTES
-async function carregarFrentes() {
+// ✅ LISTAR
+async function carregar() {
 
-  const lista = document.getElementById("lista");
   lista.innerHTML = "<h2>Frentes</h2>";
 
-  const snapshot = await db.collection("Frentes").get();
+  const snap = await db.collection("Frentes").get();
 
-  snapshot.forEach(doc => {
+  snap.forEach(doc => {
 
     const data = doc.data();
 
     const btn = document.createElement("button");
     btn.innerText = data.Nome;
-    btn.onclick = () => abrirDetalhe(data);
+    btn.onclick = () => abrir(data);
 
     lista.appendChild(btn);
   });
 }
 
 
-// CRIAR SEÇÃO (INTELIGENTE)
-function criarSecao(secao, titulo) {
+// ✅ CRIA SEÇÃO
+function secao(s, nome) {
 
-  if (!secao) return "";
+  if (!s) return "";
 
-  let html = `<div class="bloco">`;
+  let h = `<div class="bloco"><h3>${nome}</h3>`;
 
-  html += `<h2 class="tituloSecao">${titulo}</h2>`;
+  if (s["Data Prevista"]) h += `<p>${s["Data Prevista"]}</p>`;
+  if (s.Total) h += `<p>Total: ${s.Total}</p>`;
+  if (s["Avanço"]) h += `<p>Avanço: ${s["Avanço"]}</p>`;
+  if (s.Situacao) h += `<p>${s.Situacao}</p>`;
 
-  if (secao["Data Prevista"]) html += `<p>${secao["Data Prevista"]}</p>`;
-  if (secao.Total) html += `<p>Total: ${secao.Total}</p>`;
-  if (secao["Avanço"]) html += `<p>Avanço: ${secao["Avanço"]}</p>`;
+  if (s.Imagem1) h += `<img src="${s.Imagem1 abrir(data) {
 
-  if (secao.Situacao) html += `<div class="tituloVerde">${secao.Situacao}</div>`;
+  lista.style.display = "none";
+  detalhe.style.display = "block";
 
-  if (secao.Inicio || secao.Previsto || secao.Realizado) {
-    html += `<h3>Previsto x Realizado</h3>`;
-    if (secao.Inicio) html += `<p>${secao.Inicio}</p>`;
-    if (secao.Previsto) html += `<p>${secao.Previsto}</p>`;
-    if (secao.Realizado) html += `<p>${secao.Realizado}</p>`;
-  }
+  titulo.innerText = data.Nome;
 
-  if (secao.Grafico) html += `<img src="${secao.Grafico}ao.Imagem2}ecao.Imagem3) html += `<img src="${secao.Imagem3} += `</div>`;
+  banner.style.backgroundImage = `url('${data.Imagem}')`;
 
-  return html;
+  conteudo.innerHTML =
+    secao(data.LadoSul, "LADO SUL") +
+    secao(data.LadoOeste, "LADO OESTE");
 }
 
 
-// ABRIR DETALHE
-function abrirDetalhe(data) {
-
-  document.getElementById("lista").style.display = "none";
-  document.getElementById("detalhe").style.display = "block";
-
-  document.getElementById("titulo").innerText = data.Nome || "";
-
-  document.getElementById("banner").style.backgroundImage =
-    "url('" + data.Imagem + "')";
-
-  let html = "";
-  html += criarSecao(data.LadoSul, "LADO SUL");
-  html += criarSecao(data.LadoOeste, "LADO OESTE");
-
-  document.getElementById("conteudoSecoes").innerHTML = html;
-}
-
-
-// VOLTAR
+// ✅ VOLTAR
 function voltar() {
-  document.getElementById("lista").style.display = "block";
-  document.getElementById("detalhe").style.display = "none";
+  lista.style.display = "block";
+  detalhe.style.display = "none";
 }
 
 </script>
