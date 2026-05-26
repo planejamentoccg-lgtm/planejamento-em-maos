@@ -3,9 +3,10 @@
 <head>
   <title>Planejamento em Mãos</title>
 
+  <!-- RESPONSIVO -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- FONTE LATO -->
+  <!-- ✅ FONTE LATO (CORRETO) -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -80,8 +81,8 @@
 
     img {
       max-width: 90%;
-      margin: 10px 0;
       border-radius: 8px;
+      margin: 10px 0;
     }
 
     button {
@@ -130,7 +131,7 @@
 
     <div id="topo">
       <img src="https://i.imgur.com/iZ8gr1i.png">
-      <h2>TESTE NOVO CODIGO</h2>
+      <h2>Planejamento em Mãos</h2>
     </div>
 
     <div id="banner">
@@ -145,7 +146,7 @@
 
 </div>
 
-<!-- FIREBASE -->
+<!-- ✅ FIREBASE (CORRETO AGORA) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -159,6 +160,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -170,7 +172,6 @@ async function login() {
   const senha = document.getElementById("senha").value;
 
   try {
-
     const userCredential = await auth.signInWithEmailAndPassword(email, senha);
     const user = userCredential.user;
 
@@ -182,7 +183,7 @@ async function login() {
     if (!docSnap.exists) {
       await ref.set({ device });
     } else if (docSnap.data().device !== device) {
-      alert("🚫 Usuário vinculado a outro dispositivo");
+      alert("🚫 Usuário já vinculado a outro dispositivo");
       await auth.signOut();
       return;
     }
@@ -219,7 +220,7 @@ async function carregarFrentes() {
 }
 
 
-// CRIAR BLOCO SEM UNDEFINED
+// CRIAR SEÇÃO (INTELIGENTE)
 function criarSecao(secao, titulo) {
 
   if (!secao) return "";
@@ -241,7 +242,7 @@ function criarSecao(secao, titulo) {
     if (secao.Realizado) html += `<p>${secao.Realizado}</p>`;
   }
 
-  if (secao.Grafico) html += `<img src="${secao.Grafico}ao.Imagem(secao.Imagem3) html += `<img src="${secao.Imagem3} += `</div>`;
+  if (secao.Grafico) html += `<img src="${secao.Grafico}ao.Imagem2}ecao.Imagem3) html += `<img src="${secao.Imagem3} += `</div>`;
 
   return html;
 }
