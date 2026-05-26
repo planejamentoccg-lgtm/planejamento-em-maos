@@ -3,7 +3,6 @@
 <head>
   <title>Planejamento em Mãos</title>
 
-  <!-- ✅ RESPONSIVO -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- ✅ FONTE LATO -->
@@ -31,19 +30,19 @@
 
     #topo h2 {
       margin-left: 15px;
-      font-weight: 400;
       color: #2c3e50;
+      font-weight: 400;
     }
 
     #banner {
-      height: 250px;
+      height: 240px;
       background-size: cover;
       background-position: center;
       display: flex;
       justify-content: center;
       align-items: center;
       color: white;
-      font-size: 38px;
+      font-size: 36px;
       text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     }
 
@@ -65,10 +64,12 @@
 
     .bloco {
       padding: 25px;
+      border-bottom: 1px solid #ddd;
     }
 
     .tituloAzul {
       color: #1f6e8c;
+      font-size: 22px;
     }
 
     .tituloVerde {
@@ -78,23 +79,13 @@
 
     img {
       max-width: 90%;
-      margin: 15px 0;
+      margin: 10px 0;
       border-radius: 8px;
-    }
-
-    button {
-      margin: 20px;
-      padding: 10px 20px;
-      background: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
     }
 
     @media (max-width: 768px) {
       #banner {
-        height: 180px;
+        height: 160px;
         font-size: 24px;
       }
 
@@ -111,7 +102,6 @@
 
 <body>
 
-<!-- LOGIN -->
 <div id="login">
   <h1>Login</h1>
   <input type="email" id="email"><br><br>
@@ -119,7 +109,6 @@
   <button onclick="login()">Entrar</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
   <div id="lista"></div>
@@ -135,7 +124,7 @@
       <span id="titulo"></span>
     </div>
 
-    <!-- 🔥 CONTAINER DAS SEÇÕES -->
+    <!-- ✅ AQUI VÃO AS SEÇÕES -->
     <div id="conteudoSecoes"></div>
 
     <button onclick="voltar()">Voltar</button>
@@ -144,7 +133,6 @@
 
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -163,7 +151,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// 🔐 LOGIN COM BLOQUEIO
+// ✅ LOGIN COM BLOQUEIO
 async function login() {
 
   const email = document.getElementById("email").value;
@@ -199,11 +187,11 @@ async function login() {
 }
 
 
-// LISTA
+// ✅ LISTAR FRENTES
 async function carregarFrentes() {
 
   const lista = document.getElementById("lista");
-  lista.innerHTML = "<h1>Frentes</h1>";
+  lista.innerHTML = "<h2>Frentes</h2>";
 
   const snapshot = await db.collection("Frentes").get();
 
@@ -220,57 +208,54 @@ async function carregarFrentes() {
 }
 
 
-// 🔥 DETALHE COM SEÇÕES
+// 🔥 CRIAR SEÇÕES (VERSÃO CORRIGIDA)
+function criarSecao(secao, titulo) {
+
+  if (!secao) return "";
+
+  return `
+    <div class="bloco">
+
+      <h2 class="tituloAzul">${titulo}</h2>
+
+      <h3 class="tituloAzul">Dados</h3>
+      <p>${secao["Data Prevista"] || ""}</p>
+      <p>Total: ${secao.Total || ""}</p>
+      <p>Avanço: ${secao["Avanço"] || ""}</p>
+
+      <h3 class="tituloVerde">${secao.Situacao || ""}</h3>
+
+      <h3 class="tituloAzul">Previsto x Realizado</h3>
+      <p>${secao.Inicio || ""}</p>
+      <p>${secao.Previsto || ""}</p>
+      <p>${secao.Realizado || ""}</p>
+
+      ${secao.Grafico ? `<img src="${secao.Grafico}gem2}    ${secao.Imagem3 ? `<img src="${secao.Imagem
+    </div>
+  `;
+}
+
+
+// ✅ ABRIR DETALHE
 function abrirDetalhe(data) {
 
   document.getElementById("lista").style.display = "none";
   document.getElementById("detalhe").style.display = "block";
 
-  document.getElementById("titulo").innerText = data.Nome;
+  document.getElementById("titulo").innerText = data.Nome || "";
   document.getElementById("banner").style.backgroundImage =
     "url('" + data.Imagem + "')";
 
-  const container = document.getElementById("conteudoSecoes");
-  container.innerHTML = "";
+  const html =
+    criarSecao(data.LadoSul, "LADO SUL") +
+    criarSecao(data.LadoOeste, "LADO OESTE");
 
-  function criarSecao(secao, titulo) {
-
-    if (!secao) return;
-
-    const div = document.createElement("div");
-    div.className = "bloco";
-
-    div.innerHTML = `
-      <h2 class="tituloAzul">${titulo}</h2>
-
-      <p>${secao["Data Prevista"] || ""}</p>
-      <p>Total: ${secao.Total || ""}</p>
-      <p>Avanço: ${secao["Avanço"] || ""}</p>
-
-      <p class="tituloVerde">${secao.Situacao || ""}</p>
-
-      <p>${secao.Inicio || ""}</p>
-      <p>${secao.Previsto || ""}</p>
-      <p>${secao.Realizado || ""}</p>
-
-      ${secao.Grafico || ""}
-      <br>
-
-      ${secao.Imagem1 || ""}
-      ${secao.Imagem2 || ""}
-      ${secao.Imagem3 || ""}
-    `;
-
-    container.appendChild(div);
-  }
-
-  criarSecao(data.LadoSul, "LADO SUL");
-  criarSecao(data.LadoOeste, "LADO OESTE");
+  document.getElementById("conteudoSecoes").innerHTML = html;
 
 }
 
 
-// VOLTAR
+// ✅ VOLTAR
 function voltar() {
   document.getElementById("lista").style.display = "block";
   document.getElementById("detalhe").style.display = "none";
